@@ -1,0 +1,335 @@
+/*******************************************************/
+-- steps on old db
+-- dump metadata from old DB
+mkdir /n04/oraarch2/ce_pump_dir
+-- conn dba_admin/dba_admin
+> create directory CE_PUMP_DIR as '/n04/oraarch2/ce_pump_dir';
+
+-- collect public synonyms and specific privs
+> @gen_create_public_synonym.sql
+> @gen_grant_privs_others.sql
+
+-- export metadata
+expdp dba_admin/dba_admin parfile=expCE_metadata.par;
+
+-- export data separately
+
+expdp dba_admin/dba_admin parfile=expCE_data.par_ems;
+expdp dba_admin/dba_admin parfile=expCE_data.par_frt;
+expdp dba_admin/dba_admin parfile=expCE_data.par_gfms;
+expdp dba_admin/dba_admin parfile=expCE_data.par_mpd2;
+expdp dba_admin/dba_admin parfile=expCE_data.par_oil;
+expdp dba_admin/dba_admin parfile=expCE_data.par_otd;
+expdp dba_admin/dba_admin parfile=expCE_data.par_ste;
+expdp dba_admin/dba_admin parfile=expCE_data.par_nda;
+expdp dba_admin/dba_admin parfile=expCE_data.par_platts;
+expdp dba_admin/dba_admin parfile=expCE_data.par_spatial;
+expdp dba_admin/dba_admin parfile=expCE_data.par_sdi;
+expdp dba_admin/dba_admin parfile=expCE_data.par_cef1;
+expdp dba_admin/dba_admin parfile=expCE_data.par_cef2;
+
+
+/*******************************************************/
+-- steps on new db
+--create new tablespaces on Prod database:
+> conn /as sysdba
+> @create_tablespaces.sql
+> @create_users.sql
+-- set  pwd for user dba_admin
+>  alter user dba_admin identified by dba_admin;
+
+
+-- import metadata
+> connect dba_admin/dba_admin
+> create or replace directory CE_PUMP_DIR as '/n04/oraarch2/ce_pump_dir';
+
+-- impdp cost around 8 mins (<=10mins)
+impdp dba_admin/dba_admin parfile=impCE_metadata.par
+
+
+
+-- further steps in new db
+-- connect / as sysdba
+
+-- create public synonyms
+> @drop_old_public_synonyms.sql;
+> @create_public_synonyms.sql;
+
+-- grant specific privs
+> @grant_privs_others.sql;
+
+-- recompile all objects
+>  connect / as sysdba
+> @$ORACLE_HOME/rdbms/admin/utlrp.sql;
+
+-- disable all triggers
+> @disable_triggers.sql;
+-- disable all db jobs + scheduler jobs
+> @stop_jobs.sql;
+
+/*
+-- drop unexpected jobs if there are any
+BEGIN
+  FOR tmp IN ( --
+              SELECT *
+                FROM dba_scheduler_jobs
+               WHERE regexp_substr(job_name, '^CE[0-9]{4}\_[0-9]{14}\_[0-9]$') IS NOT NULL) LOOP
+    dbms_scheduler.drop_job(tmp.owner || '.' || tmp.job_name);
+  END LOOP;
+END;
+*/
+
+-- disable non-C constraints
+-- excluding C types of constraints, because it's difficult to enable them later
+> @disable_non_c_constraints.sql;
+
+
+-- drop some specific indexes
+-- 'VESSEL_LOCATION', 'VESSEL_EVENT', 'PIERS_TRANSACTION', 'PROCESSING_DETAIL', 'HISTORICAL_CELL_VALUE'
+> @drop_big_indexes.sql;
+
+
+-- import data to new db
+-- cost 40 mins for all (cef2 cost 20 mins)
+impdp dba_admin/dba_admin parfile=impCE_data.par_gfms;
+impdp dba_admin/dba_admin parfile=impCE_data.par_ems;
+impdp dba_admin/dba_admin parfile=impCE_data.par_frt;
+impdp dba_admin/dba_admin parfile=impCE_data.par_oil;
+impdp dba_admin/dba_admin parfile=impCE_data.par_otd;
+impdp dba_admin/dba_admin parfile=impCE_data.par_ste;
+impdp dba_admin/dba_admin parfile=impCE_data.par_nda;
+impdp dba_admin/dba_admin parfile=impCE_data.par_platts;
+impdp dba_admin/dba_admin parfile=impCE_data.par_sdi;
+impdp dba_admin/dba_admin parfile=impCE_data.par_spatial;
+
+
+impdp dba_admin/dba_admin parfile=impCE_data.par_mpd2;
+impdp dba_admin/dba_admin parfile=impCE_data.par_cef1; 
+impdp dba_admin/dba_admin parfile=impCE_data.par_cef2; 
+
+
+-- move index tablespaces
+-- cost 8 mins
+@move_index_tablespace.sql;
+
+
+-- create removed indexes 
+-- 'VESSEL_LOCATION', 'VESSEL_EVENT', 'PIERS_TRANSACTION', 'PROCESSING_DETAIL', 'HISTORICAL_CELL_VALUE'
+-- cost 40mins
+> @create_big_indexes.sql;
+
+
+-- create some temporary indexes for enabling R constraints
+> @gen_tmp_indexes_creation_remove.sql;
+> @create_tmp_indexes.sql;
+
+
+-- recollect statistics for the related objects
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('CEF_CNR');
+> @gen_gather_ind_statistics.sql;
+> @gather_ind_statistics;
+/*************************** 
+-- or run the below to collect statistics for tables directly
+> EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'VESSEL_LOCATION',estimate_percent=>100,degree=>8,cascade=>true);
+> EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'VESSEL_EVENT',estimate_percent=>100,degree=>8,cascade=>true);
+> EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'PIERS_TRANSACTION',estimate_percent=>100,degree=>8,cascade=>true);
+> EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'PROCESSING_DETAIL',estimate_percent=>100,degree=>8,cascade=>true);
+> EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'HISTORICAL_CELL_VALUE',estimate_percent=>100,degree=>8,cascade=>true);
+********************************/
+
+-- enable all constraints (around 20 mins)
+-- enable non-R constraints
+> @gen_enable_non_r_constraints.sql;
+> @enable_non_r_constraints.sql;
+> connect dba_admin/dba_admin
+-- !!!!!! run the scripts in validate_constraints_in_parallel1.sql separately (8 sessions) !!!!!  
+
+-- remove the temporary indexes
+> @remove_tmp_indexes.sql
+-- enable all triggers
+> @enable_triggers.sql;
+
+
+-- remove users out-of-use
+> drop user MPD2_PDS CASCADE;
+> drop user STE_PDS CASCADE;
+> drop user OIL_PDS CASCADE;
+> drop user EMS_PDS CASCADE;
+> drop user OTD_PDS CASCADE;
+> drop user FRT_PDS CASCADE;
+
+-- recreate CEF_APDS.HISTORICAL_CELL_VALUE_M_V
+> @recreate_cef_apds_historical_cell_value_mv.sql;
+
+-- recreate CEF_CNR.DIMENSION_DATA_MV
+> @recreate_cef_cnr_dimension_data_mv.sql;
+
+-- move all refreshing jobs to dba_scheduler_jobs
+> connect mpd2_apds/mpd2_apds
+> @replace_MPD2_APDS_10M_RG1.sql;
+
+> connect ems_apds/ems_apds
+> @replace_EMS_APDS_6H_RG1.sql;
+
+> connect ste_cnr/ste_cnr
+> @replace_STE_CNR_30M_RG1.sql;
+
+> connect ems_cnr/ems_cnr
+> @replace_EMS_CNR_dba_jobs.sql;
+
+> connect mpd2_cnr/mpd2_cnr
+> @replace_MPD2_CNR_dba_jobs.sql;
+
+
+-- !!!!!!!!!!!! remove unwanted objects !!!!!!!!!!!! 
+-- China coal mvs
+> connect dba_admin/dba_admin
+> execute dbms_scheduler.drop_job('CEF_APDS.REFRESH_CH_COAL_IMPORT_MVS');
+> drop materialized view CEF_APDS.CHINA_COAL_IMPORT_COUNTRY_M_V;
+> drop materialized view CEF_APDS.CHINA_COAL_IMPORT_FORECAST_M_V;
+> drop materialized view CEF_APDS.CHINA_COAL_IMPORT_PREVIOUS_M_V;
+> drop materialized view CEF_APDS.CHINA_POR_BER_ANC_M_V;
+
+-- Oil in OIL_CNR mvs
+> connect oil_cnr/oil_cnr
+> execute DBMS_JOB.REMOVE(24400087);
+> execute DBMS_JOB.REMOVE(29014831);
+> commit;
+> connect dba_admin/dba_admin
+> DROP MATERIALIZED VIEW OIL_CNR.OIL_AGGREGATED_DATA_MV;
+> DROP MATERIALIZED VIEW OIL_CNR.OIL_COMMODITY_DATA_MV;
+> create synonym OIL_CNR.OIL_COMMODITY_DATA_MV for OIL_APDS.OIL_COMMODITY_DATA_MV;
+> create synonym OIL_CNR.OIL_AGGREGATED_DATA_MV for OIL_APDS.OIL_AGGREGATED_DATA_MV;
+
+
+
+-- remove the temporary objects
+> drop materialized view CEF_CNR.COMMODITY_FLOW_HIS_M_V_1;
+> drop materialized view CEF_CNR.COMMODITY_FLOW_HIS_M_V_2;
+> drop materialized view CEF_CNR.VZT_MAPPING_MV;
+> drop materialized view MPD2_APDS.AGGREGATE_CPT_FORMAT_M_V01;
+> drop materialized view MPD2_APDS.AGGREGATE_CPT_FORMAT_M_V02;
+> drop materialized view MPD2_APDS.AGGREGATE_CPT_M_V01;
+> drop materialized view MPD2_APDS.AGGREGATE_CPT_M_V02;
+> drop materialized view MPD2_APDS.PRODUCTION_CAPACITY01_M_V;
+> drop materialized view MPD2_APDS.PRODUCTION_CAPACITY02_M_V;
+
+> drop table CEF_APDS.vessel_latest_polygons_bk;
+> drop table CEF_APDS.vessel_latest_track_bk;
+> drop table CEF_APDS.vessel_previous_port_bk;
+> drop table CEF_APDS.vessel_fact_details_latest_bk;
+> drop table CEF_APDS.fixture_m_v_bk;
+> drop table CEF_APDS.fixture_region_assoc_m_v_bk;
+> drop table CEF_APDS.vessel_flow_m_v_bk;
+> drop table CEF_APDS.vessel_flow_fixture_m_v_bk;
+> drop table CEF_CNR.vt_vessel_m_v_bk;
+
+> drop materialized view cef_cnr.commodity_flow_m_v;
+
+> drop table MPD2_APDS.aggregate_cpt;
+> drop table MPD2_APDS.AGGREGATE_CPT_FORMAT;
+> drop table MPD2_APDS.production_capacity_yr;
+> drop table MPD2_APDS.production_capacity_base;
+
+
+-- recompile all objects
+>  connect / as sysdba
+> @$ORACLE_HOME/rdbms/admin/utlrp.sql;
+-- double check status of all objects
+SELECT *
+  FROM all_objects
+ WHERE owner IN
+       ('CEF_CNR', 'MPD2_CNR', 'STE_CNR', 'OIL_CNR', 'EMS_CNR', 'OTD_CNR',
+        'FRT_CNR', 'GFMS_CNR', 'CEF_APDS', 'MPD2_APDS', 'STE_APDS',
+        'OIL_APDS', 'EMS_APDS', 'OTD_APDS', 'FRT_APDS', 'GFMS_APDS',
+        'PLATTS_CNR', 'SDI_CNR', 'SPATIAL_CNR', 'NDA_CNR')
+   AND status <> 'VALID';
+------- ignore two objects below ------
+------- SDI_CNR.SDI_COMMODITY_FLOW_UTIL_PKG ------
+
+
+-- refresh all mviews
+-- !!!!!! run the scripts in refresh_mviews_in_parallel.sql separately (8 sessions) !!!!!  
+ 
+-- refresh some special mviews in sequence 
+-- cost around 50 mins, coal flows refreshing run the longest
+> connect dba_admin/dba_admin
+> @refresh_mviews_in_sequence.sql;
+
+ 
+-- unlock statistics of data schemas
+> connect dba_admin/dba_admin
+
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('CEF_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('MPD2_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('STE_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('OIL_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('EMS_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('OTD_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('FRT_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('GFMS_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('PLATTS_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('SDI_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('SPATIAL_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('NDA_CNR');
+
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('MPD2_APDS');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('STE_APDS');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('OIL_APDS');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('EMS_APDS');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('OTD_APDS');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('FRT_APDS');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('CEF_APDS');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('GFMS_APDS');
+
+-- lock statistics of some tables
+> execute DBMS_STATS.LOCK_TABLE_STATS('MPD2_CNR','AGGREGATED_DATA_01');
+> execute DBMS_STATS.LOCK_TABLE_STATS('MPD2_CNR','AGGREGATED_DATA_02');
+
+-- 
+
+-- recollect statistics
+> @collect_db_statistics.sql;
+-- !!!! haven't collected the time cost yet!!!! (about 50 mins)
+
+/**************************************************************
+-- run collect_db_statistics.sql or the below script
+SELECT 'execute dbms_stats.gather_schema_stats(ownname=>''' || username ||
+       ''',estimate_percent=>100,degree=>8);'
+  FROM all_users
+ WHERE username IN
+       ('CEF_CNR', 'MPD2_CNR', 'STE_CNR', 'OIL_CNR', 'EMS_CNR', 'OTD_CNR',
+        'FRT_CNR', 'GFMS_CNR', 'CEF_APDS', 'MPD2_APDS', 'STE_APDS',
+        'OIL_APDS', 'EMS_APDS', 'OTD_APDS', 'FRT_APDS', 'GFMS_APDS',
+        'PLATTS_CNR', 'SDI_CNR', 'SPATIAL_CNR', 'NDA_CNR')
+order by username;
+
+-- if the collecting failed or blocked at piers_transaction/vessel_event/vessel_location,
+-- use the below to finish the left
+BEGIN
+  FOR tmp IN (SELECT *
+                FROM all_tab_statistics
+               WHERE owner = 'CEF_CNR'
+                 AND table_name >= 'PIERS_TRANSACTION'
+                 AND table_name NOT IN ('VESSEL_EVENT', 'VESSEL_LOCATION','PIERS_TRANSACTION')
+               ORDER BY owner, table_name) LOOP
+    dbms_stats.gather_table_stats(ownname          => 'CEF_CNR',
+                                  tabname          => tmp.table_name,
+                                  estimate_percent => 100,
+                                  degree           => 8,
+                                  cascade          => TRUE);
+  END LOOP;
+END;
+/
+EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'VESSEL_LOCATION',estimate_percent=>100,degree=>8,cascade=> true);
+EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'VESSEL_EVENT',estimate_percent=>100,degree=>8,cascade=> true);
+EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'PIERS_TRANSACTION',estimate_percent=>100,degree=>8,cascade=> true);
+
+
+***************************************************************/
+
+-- start all jobs
+> @start_jobs.sql;
+
+
+
