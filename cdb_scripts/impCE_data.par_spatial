@@ -1,7 +1,7 @@
 DIRECTORY=CE_PUMP_DIR
 DUMPFILE=expCE_data_%U.dmp_spatial
 PARALLEL=1
-LOGFILE=imexpCE_data.log_spatial
+LOGFILE=impCE_data.log_spatial
 JOB_NAME=impCE_data_job_spatial
 REMAP_SCHEMA=SPATIAL:SPATIAL_CNR
 CONTENT=DATA_ONLY

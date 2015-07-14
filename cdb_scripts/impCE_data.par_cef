@@ -1,6 +1,6 @@
 DIRECTORY=CE_PUMP_DIR
 DUMPFILE=expCE_data_%U.dmp_cef
 PARALLEL=4
-LOGFILE=imexpCE_data.log_cef
+LOGFILE=impCE_data.log_cef
 JOB_NAME=impCE_data_job_cef
 TABLE_EXISTS_ACTION=TRUNCATE
