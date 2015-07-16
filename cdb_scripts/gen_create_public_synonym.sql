@@ -9,7 +9,7 @@ SELECT 'create public synonym ' || synonym_name || ' for ' ||
               'PLATTS',
               'PLATTS',
               'SDI',
-              'SDI_CNR',
+              'SDI',
               'SPATIAL',
               'SPATIAL',
               table_owner) || '.' || table_name || ';'

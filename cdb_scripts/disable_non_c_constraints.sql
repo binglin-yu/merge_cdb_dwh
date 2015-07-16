@@ -7,7 +7,7 @@ BEGIN
                       'OTD_CNR', 'FRT_CNR', 'GFMS_CNR', 'CEF_APDS',
                       'MPD2_APDS', 'STE_APDS', 'OIL_APDS', 'EMS_APDS',
                       'OTD_APDS', 'FRT_APDS', 'GFMS_APDS', 'PLATTS',
-                      'SDI_CNR', 'SPATIAL', 'NDA_CNR')
+                      'SDI', 'SPATIAL', 'NDA_CNR')
                  AND constraint_type IN ('R')) LOOP
     EXECUTE IMMEDIATE 'alter table ' || tmp.owner || '.' || tmp.table_name ||
                       ' disable constraint ' || tmp.constraint_name;
