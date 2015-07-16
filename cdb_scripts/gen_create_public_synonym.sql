@@ -7,7 +7,7 @@ prompt spool create_public_synonyms.out
 SELECT 'create public synonym ' || synonym_name || ' for ' ||
        decode(table_owner,
               'PLATTS',
-              'PLATTS_CNR',
+              'PLATTS',
               'SDI',
               'SDI_CNR',
               'SPATIAL',

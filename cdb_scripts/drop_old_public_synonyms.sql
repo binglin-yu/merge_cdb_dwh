@@ -44,7 +44,7 @@ BEGIN
                      ('CEF_CNR', 'MPD2_CNR', 'STE_CNR', 'OIL_CNR', 'EMS_CNR',
                       'OTD_CNR', 'FRT_CNR', 'GFMS_CNR', 'CEF_APDS',
                       'MPD2_APDS', 'STE_APDS', 'OIL_APDS', 'EMS_APDS',
-                      'OTD_APDS', 'FRT_APDS', 'GFMS_APDS', 'PLATTS_CNR',
+                      'OTD_APDS', 'FRT_APDS', 'GFMS_APDS', 'PLATTS',
                       'SDI_CNR', 'SPATIAL', 'NDA_CNR')) LOOP
     EXECUTE IMMEDIATE 'drop public synonym ' || tmp.synonym_name;
   END LOOP;

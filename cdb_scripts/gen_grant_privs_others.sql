@@ -10,7 +10,7 @@ SELECT 'grant ' || privilege || ' on ' || owner || '.' || table_name ||
        ('CEF_CNR', 'MPD2_CNR', 'STE_CNR', 'OIL_CNR', 'EMS_CNR', 'OTD_CNR',
         'FRT_CNR', 'GFMS_CNR', 'CEF_APDS', 'MPD2_APDS', 'STE_APDS',
         'OIL_APDS', 'EMS_APDS', 'OTD_APDS', 'FRT_APDS', 'GFMS_APDS',
-        'PLATTS_CNR', 'SDI_CNR', 'SPATIAL', 'NDA_CNR')
+        'PLATTS', 'SDI_CNR', 'SPATIAL', 'NDA_CNR')
    AND (grantor IN
        ('APEX_PUBLIC_USER', 'FLOWS_FILES', 'APEX_040200', 'ORDSYS',
         'ORDPLUGINS', 'SI_INFORMTN_SCHEMA', 'MDSYS', 'SYS')
@@ -19,7 +19,7 @@ SELECT 'grant ' || privilege || ' on ' || owner || '.' || table_name ||
                      ('CEF_CNR', 'MPD2_CNR', 'STE_CNR', 'OIL_CNR', 'EMS_CNR', 'OTD_CNR',
                       'FRT_CNR', 'GFMS_CNR', 'CEF_APDS', 'MPD2_APDS', 'STE_APDS',
                       'OIL_APDS', 'EMS_APDS', 'OTD_APDS', 'FRT_APDS', 'GFMS_APDS',
-                      'PLATTS_CNR', 'SDI_CNR', 'SPATIAL', 'NDA_CNR')*/ --
+                      'PLATTS', 'SDI_CNR', 'SPATIAL', 'NDA_CNR')*/ --
        );
 --
 

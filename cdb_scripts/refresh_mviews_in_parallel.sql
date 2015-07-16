@@ -27,7 +27,7 @@ AS SELECT OWNER, MVIEW_NAME, SYSDATE ST, SYSDATE ET FROM USER_MVIEWS WHERE 0 = 1
                  ('CEF_CNR', 'MPD2_CNR', 'STE_CNR', 'OIL_CNR', 'EMS_CNR',
                   'OTD_CNR', 'FRT_CNR', 'GFMS_CNR', 'CEF_APDS', 'MPD2_APDS',
                   'STE_APDS', 'OIL_APDS', 'EMS_APDS', 'OTD_APDS', 'FRT_APDS',
-                  'GFMS_APDS', 'PLATTS_CNR', 'SDI_CNR', 'SPATIAL',
+                  'GFMS_APDS', 'PLATTS', 'SDI_CNR', 'SPATIAL',
                   'NDA_CNR')
              --AND mview_name <> 'HISTORICAL_CELL_VALUE_M_V'
            ORDER BY owner, mview_name);
