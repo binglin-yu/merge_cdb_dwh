@@ -242,7 +242,7 @@ SELECT *
        ('CEF_CNR', 'MPD2_CNR', 'STE_CNR', 'OIL_CNR', 'EMS_CNR', 'OTD_CNR',
         'FRT_CNR', 'GFMS_CNR', 'CEF_APDS', 'MPD2_APDS', 'STE_APDS',
         'OIL_APDS', 'EMS_APDS', 'OTD_APDS', 'FRT_APDS', 'GFMS_APDS',
-        'PLATTS_CNR', 'SDI_CNR', 'SPATIAL_CNR', 'NDA_CNR')
+        'PLATTS_CNR', 'SDI_CNR', 'SPATIAL', 'NDA_CNR')
    AND status <> 'VALID';
 ------- ignore two objects below ------
 ------- SDI_CNR.SDI_COMMODITY_FLOW_UTIL_PKG ------
@@ -270,7 +270,7 @@ SELECT *
 > exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('GFMS_CNR');
 > exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('PLATTS_CNR');
 > exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('SDI_CNR');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('SPATIAL_CNR');
+> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('SPATIAL');
 > exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('NDA_CNR');
 
 > exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('MPD2_APDS');
@@ -301,7 +301,7 @@ SELECT 'execute dbms_stats.gather_schema_stats(ownname=>''' || username ||
        ('CEF_CNR', 'MPD2_CNR', 'STE_CNR', 'OIL_CNR', 'EMS_CNR', 'OTD_CNR',
         'FRT_CNR', 'GFMS_CNR', 'CEF_APDS', 'MPD2_APDS', 'STE_APDS',
         'OIL_APDS', 'EMS_APDS', 'OTD_APDS', 'FRT_APDS', 'GFMS_APDS',
-        'PLATTS_CNR', 'SDI_CNR', 'SPATIAL_CNR', 'NDA_CNR')
+        'PLATTS_CNR', 'SDI_CNR', 'SPATIAL', 'NDA_CNR')
 order by username;
 
 -- if the collecting failed or blocked at piers_transaction/vessel_event/vessel_location,

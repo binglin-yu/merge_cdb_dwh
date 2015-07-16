@@ -11,7 +11,7 @@ SELECT 'create public synonym ' || synonym_name || ' for ' ||
               'SDI',
               'SDI_CNR',
               'SPATIAL',
-              'SPATIAL_CNR',
+              'SPATIAL',
               table_owner) || '.' || table_name || ';'
   FROM dba_synonyms
  WHERE owner = 'PUBLIC'

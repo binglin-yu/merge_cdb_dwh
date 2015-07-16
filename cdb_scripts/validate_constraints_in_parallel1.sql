@@ -30,7 +30,7 @@ AS SELECT OWNER, TABLE_NAME, CONSTRAINT_NAME, SYSDATE ST, SYSDATE ET FROM USER_C
                  ('CEF_CNR', 'MPD2_CNR', 'STE_CNR', 'OIL_CNR', 'EMS_CNR',
                   'OTD_CNR', 'FRT_CNR', 'GFMS_CNR', 'CEF_APDS', 'MPD2_APDS',
                   'STE_APDS', 'OIL_APDS', 'EMS_APDS', 'OTD_APDS', 'FRT_APDS',
-                  'GFMS_APDS', 'PLATTS_CNR', 'SDI_CNR', 'SPATIAL_CNR',
+                  'GFMS_APDS', 'PLATTS_CNR', 'SDI_CNR', 'SPATIAL',
                   'NDA_CNR') /*
              AND table_name NOT IN
                  ('VESSEL_LOCATION', 'VESSEL_EVENT', 'PIERS_TRANSACTION',

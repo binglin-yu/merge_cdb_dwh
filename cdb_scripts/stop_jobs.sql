@@ -10,7 +10,7 @@ BEGIN
                     'OTD_CNR', 'FRT_CNR', 'GFMS_CNR', 'CEF_APDS', 'MPD2_APDS',
                     'STE_APDS', 'OIL_APDS', 'EMS_APDS', 'OTD_APDS',
                     'FRT_APDS', 'GFMS_APDS', 'PLATTS_CNR', 'SDI_CNR',
-                    'SPATIAL_CNR', 'NDA_CNR')
+                    'SPATIAL', 'NDA_CNR')
                AND broken = 'N') LOOP
     sys.dbms_ijob.broken(job => i.job, broken => TRUE);
   END LOOP;
@@ -22,7 +22,7 @@ BEGIN
          ('CEF_CNR', 'MPD2_CNR', 'STE_CNR', 'OIL_CNR', 'EMS_CNR', 'OTD_CNR',
           'FRT_CNR', 'GFMS_CNR', 'CEF_APDS', 'MPD2_APDS', 'STE_APDS',
           'OIL_APDS', 'EMS_APDS', 'OTD_APDS', 'FRT_APDS', 'GFMS_APDS',
-          'PLATTS_CNR', 'SDI_CNR', 'SPATIAL_CNR', 'NDA_CNR')
+          'PLATTS_CNR', 'SDI_CNR', 'SPATIAL', 'NDA_CNR')
      AND (broken = 'N' OR this_date IS NOT NULL);
   IF v_int > 0 THEN
     dbms_output.put_line('Job is still running. Please wait a while and run this script again.');
@@ -40,7 +40,7 @@ BEGIN
                     'OTD_CNR', 'FRT_CNR', 'GFMS_CNR', 'CEF_APDS', 'MPD2_APDS',
                     'STE_APDS', 'OIL_APDS', 'EMS_APDS', 'OTD_APDS',
                     'FRT_APDS', 'GFMS_APDS', 'PLATTS_CNR', 'SDI_CNR',
-                    'SPATIAL_CNR', 'NDA_CNR')) LOOP
+                    'SPATIAL', 'NDA_CNR')) LOOP
     BEGIN
       EXECUTE IMMEDIATE 'begin dbms_scheduler.disable(''' || i.owner || '.' ||
                         i.job_name || ''',TRUE); end;';

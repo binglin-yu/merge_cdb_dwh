@@ -51,11 +51,11 @@ create tablespace CEF_APDS_INDEX01       datafile '/s01/oradata1/ord723/orp723_c
 
 create tablespace SDI_CNR_DATA01                    datafile '/s01/oradata1/ord723/orp723_sdi_cnr_data01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 
 create tablespace PLATTS_CNR_DATA01                 datafile '/s01/oradata1/ord723/orp723_platts_cnr_data01_01.dbf' size 4G autoextend on extent management local uniform size 10m segment space management auto; 
-create tablespace SPATIAL_CNR_DATA01                datafile '/s01/oradata1/ord723/orp723_spatial_cnr_data01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 
+create tablespace SPATIAL_DATA01                datafile '/s01/oradata1/ord723/orp723_spatial_cnr_data01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 
 
 create tablespace SDI_CNR_INDEX01           datafile '/s01/oradata1/ord723/orp723_sdi_cnr_index01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 
 create tablespace PLATTS_CNR_INDEX01        datafile '/s01/oradata1/ord723/orp723_platts_cnr_index01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 
-create tablespace SPATIAL_CNR_INDEX01       datafile '/s01/oradata1/ord723/orp723_spatial_cnr_index01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 
+create tablespace SPATIAL_INDEX01       datafile '/s01/oradata1/ord723/orp723_spatial_cnr_index01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 
 
 
 spool off

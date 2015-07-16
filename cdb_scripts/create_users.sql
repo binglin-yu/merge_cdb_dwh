@@ -21,7 +21,7 @@ create user GFMS_APDS identified by GFMS_APDS default tablespace GFMS_APDS_DATA0
 
 create user SDI_CNR identified by SDI_CNR          default tablespace SDI_CNR_DATA01     temporary tablespace temp01 quota unlimited on SDI_CNR_DATA01 ;
 create user PLATTS_CNR identified by PLATTS_CNR    default tablespace PLATTS_CNR_DATA01  temporary tablespace temp01 quota unlimited on PLATTS_CNR_DATA01 ;
-create user SPATIAL_CNR identified by SPATIAL_CNR  default tablespace SPATIAL_CNR_DATA01 temporary tablespace temp01 quota unlimited on SPATIAL_CNR_DATA01 ;
+create user SPATIAL identified by SPATIAL  default tablespace SPATIAL_DATA01 temporary tablespace temp01 quota unlimited on SPATIAL_DATA01 ;
 
 -- create pds users to avoid granting errors during impdp
 create user MPD2_PDS identified by MPD2_PDS default tablespace CEF_CNR_DATA01  temporary tablespace temp01;
