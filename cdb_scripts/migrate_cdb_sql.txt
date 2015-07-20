@@ -110,7 +110,9 @@ impdp dba_admin/dba_admin parfile=impCE_data.par_cef2;
 
 -- move index tablespaces
 -- cost 8 mins
-@move_index_tablespace.sql;
+> conn / as sysdba
+> set timing on
+> @move_index_tablespace.sql;
 
 
 -- create removed indexes 
@@ -256,6 +258,8 @@ SELECT *
 > connect dba_admin/dba_admin
 > @refresh_mviews_in_sequence.sql;
 
+-- collect statistics for CEF_APDS.HISTORICAL_CELL_VALUE_M_V, because this mview is recreated
+> EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_APDS',tabname=>'HISTORICAL_CELL_VALUE_M_V',estimate_percent=>100,degree=>8,cascade=> true);
  
 -- unlock statistics of data schemas
 > connect dba_admin/dba_admin

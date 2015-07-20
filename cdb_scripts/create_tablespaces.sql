@@ -2,7 +2,7 @@ spool create_tablespaces.out
 set timing on
 create tablespace CEF_CNR_DATA01    datafile '/s01/oradata1/ord723/orp723_cef_cnr_data01_01.dbf'   size 30G autoextend on extent management local uniform size 10m segment space management auto;
 alter tablespace CEF_CNR_DATA01 add datafile '/s01/oradata1/ord723/orp723_cef_cnr_data01_02.dbf'   size 30G autoextend on ;
-alter tablespace CEF_CNR_DATA01 add datafile '/s01/oradata1/ord723/orp723_cef_cnr_data01_03.dbf'   size 10G autoextend on ;
+alter tablespace CEF_CNR_DATA01 add datafile '/s01/oradata1/ord723/orp723_cef_cnr_data01_03.dbf'   size 30G autoextend on ;
 create tablespace CEF_CNR_INDEX01   datafile '/s01/oradata1/ord723/orp723_cef_cnr_index01_01.dbf'  size 30G autoextend on extent management local uniform size 10m segment space management auto;
 alter tablespace CEF_CNR_INDEX01   add datafile '/s01/oradata1/ord723/orp723_cef_cnr_index01_02.dbf'   size 30G autoextend on ;
 alter tablespace CEF_CNR_INDEX01   add datafile '/s01/oradata1/ord723/orp723_cef_cnr_index01_03.dbf'   size 30G autoextend on ;
@@ -46,7 +46,7 @@ create tablespace STE_APDS_INDEX01       datafile '/s01/oradata1/ord723/orp723_s
 create tablespace GFMS_APDS_DATA01       datafile '/s01/oradata1/ord723/orp723_gfms_apds_data01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 
 create tablespace GFMS_APDS_INDEX01      datafile '/s01/oradata1/ord723/orp723_gfms_apds_index01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 
 create tablespace CEF_APDS_DATA01        datafile '/s01/oradata1/ord723/orp723_cef_apds_data01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 
-create tablespace CEF_APDS_INDEX01       datafile '/s01/oradata1/ord723/orp723_cef_apds_index01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 
+create tablespace CEF_APDS_INDEX01       datafile '/s01/oradata1/ord723/orp723_cef_apds_index01_01.dbf' size 5G autoextend on extent management local uniform size 1m segment space management auto; 
 
 
 create tablespace SDI_DATA01                    datafile '/s01/oradata1/ord723/orp723_sdi_data01_01.dbf' size 512m autoextend on extent management local uniform size 1m segment space management auto; 

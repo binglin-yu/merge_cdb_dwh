@@ -1,5 +1,5 @@
 set timing on
-
+set serveroutput on
 spool create_big_indexes.out
 
   CREATE INDEX CEF_CNR.VEV_LAT_CLO_I ON CEF_CNR.VESSEL_EVENT (VES_ID, IS_LATEST, IS_CLOSED)

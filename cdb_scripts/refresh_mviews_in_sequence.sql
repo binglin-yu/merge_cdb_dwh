@@ -8,9 +8,6 @@ connect MPD2_CNR/MPD2_CNR
 execute MPD2_CNR.REFRESH_GEO_UNIT;
 
 connect STE_CNR/STE_CNR
-execute dbms_refresh.refresh('STE_CNR.STE_CNR_30M_RG1');
-
-connect STE_CNR/STE_CNR
 execute ste_cnr.feed_steo_statistic_result;
 
 

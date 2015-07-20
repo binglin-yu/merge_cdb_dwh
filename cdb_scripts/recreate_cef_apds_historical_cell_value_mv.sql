@@ -23,3 +23,9 @@ AS
     FROM historical_cell_value hcv, report_release rls
    WHERE hcv.end_date IS NULL
      AND hcv.rls_id = rls.id;
+
+create unique index CEF_APDS.HCVMV_PK_I on CEF_APDS.HISTORICAL_CELL_VALUE_M_V (ID) tablespace CEF_APDS_INDEX01;
+create index  CEF_APDS.HCVMV_QUERY_I on  CEF_APDS.HISTORICAL_CELL_VALUE_M_V (RCE_ID, PERIOD_START, PERIOD_END) tablespace CEF_APDS_INDEX01;
+create index  CEF_APDS.HCVMV_QUERY_RD_I on  CEF_APDS.HISTORICAL_CELL_VALUE_M_V (RCE_ID, REPORT_DATE) tablespace CEF_APDS_INDEX01;
+create index CEF_APDS.HCVMV_QUERY_RLD_I on CEF_APDS.HISTORICAL_CELL_VALUE_M_V (RCE_ID, RELEASE_DATE) tablespace CEF_APDS_INDEX01;
+
