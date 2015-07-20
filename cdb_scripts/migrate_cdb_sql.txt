@@ -160,11 +160,17 @@ impdp dba_admin/dba_admin parfile=impCE_data.par_cef2;
 > drop user OTD_PDS CASCADE;
 > drop user FRT_PDS CASCADE;
 
+
+-- recreate some objects (which fail to get successfully via export/import)
 -- recreate CEF_APDS.HISTORICAL_CELL_VALUE_M_V
 > @recreate_cef_apds_historical_cell_value_mv.sql;
 
 -- recreate CEF_CNR.DIMENSION_DATA_MV
 > @recreate_cef_cnr_dimension_data_mv.sql;
+
+-- recreate job refresh_coal_flow_mv_group
+> connect cef_apds/cef_apds
+> @recreate_job_refresh_coal_flow_mv_group.sql
 
 -- move all refreshing jobs to dba_scheduler_jobs
 > connect mpd2_apds/mpd2_apds
@@ -206,32 +212,7 @@ impdp dba_admin/dba_admin parfile=impCE_data.par_cef2;
 
 
 -- remove the temporary objects
-> drop materialized view CEF_CNR.COMMODITY_FLOW_HIS_M_V_1;
-> drop materialized view CEF_CNR.COMMODITY_FLOW_HIS_M_V_2;
-> drop materialized view CEF_CNR.VZT_MAPPING_MV;
-> drop materialized view MPD2_APDS.AGGREGATE_CPT_FORMAT_M_V01;
-> drop materialized view MPD2_APDS.AGGREGATE_CPT_FORMAT_M_V02;
-> drop materialized view MPD2_APDS.AGGREGATE_CPT_M_V01;
-> drop materialized view MPD2_APDS.AGGREGATE_CPT_M_V02;
-> drop materialized view MPD2_APDS.PRODUCTION_CAPACITY01_M_V;
-> drop materialized view MPD2_APDS.PRODUCTION_CAPACITY02_M_V;
-
-> drop table CEF_APDS.vessel_latest_polygons_bk;
-> drop table CEF_APDS.vessel_latest_track_bk;
-> drop table CEF_APDS.vessel_previous_port_bk;
-> drop table CEF_APDS.vessel_fact_details_latest_bk;
-> drop table CEF_APDS.fixture_m_v_bk;
-> drop table CEF_APDS.fixture_region_assoc_m_v_bk;
-> drop table CEF_APDS.vessel_flow_m_v_bk;
-> drop table CEF_APDS.vessel_flow_fixture_m_v_bk;
-> drop table CEF_CNR.vt_vessel_m_v_bk;
-
-> drop materialized view cef_cnr.commodity_flow_m_v;
-
-> drop table MPD2_APDS.aggregate_cpt;
-> drop table MPD2_APDS.AGGREGATE_CPT_FORMAT;
-> drop table MPD2_APDS.production_capacity_yr;
-> drop table MPD2_APDS.production_capacity_base;
+> @remove_old_temporary_objects.sql;
 
 
 -- recompile all objects
@@ -250,7 +231,7 @@ SELECT *
 ------- SDI.SDI_COMMODITY_FLOW_UTIL_PKG ------
 
 
--- refresh all mviews
+-- refresh all mviews (20 mins)
 -- !!!!!! run the scripts in refresh_mviews_in_parallel.sql separately (8 sessions) !!!!!  
  
 -- refresh some special mviews in sequence 
@@ -263,38 +244,13 @@ SELECT *
  
 -- unlock statistics of data schemas
 > connect dba_admin/dba_admin
-
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('CEF_CNR');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('MPD2_CNR');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('STE_CNR');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('OIL_CNR');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('EMS_CNR');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('OTD_CNR');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('FRT_CNR');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('GFMS_CNR');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('PLATTS');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('SDI');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('SPATIAL');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('NDA_CNR');
-
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('MPD2_APDS');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('STE_APDS');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('OIL_APDS');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('EMS_APDS');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('OTD_APDS');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('FRT_APDS');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('CEF_APDS');
-> exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('GFMS_APDS');
-
--- lock statistics of some tables
-> execute DBMS_STATS.LOCK_TABLE_STATS('MPD2_CNR','AGGREGATED_DATA_01');
-> execute DBMS_STATS.LOCK_TABLE_STATS('MPD2_CNR','AGGREGATED_DATA_02');
+> @update_stats_locks.sql;
 
 -- 
 
 -- recollect statistics
 > @collect_db_statistics.sql;
--- !!!! haven't collected the time cost yet!!!! (about 50 mins)
+-- !!!! haven't collected the time cost yet!!!! (cef_cnr recollecting takes 70 mins)
 
 /**************************************************************
 -- run collect_db_statistics.sql or the below script
@@ -334,6 +290,9 @@ EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'PIERS_TRANSAC
 
 -- start all jobs
 > @start_jobs.sql;
+
+-- grant special privs for DWH
+> @grant_privs_to_dwh.sql;
 
 
 
