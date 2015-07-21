@@ -65,6 +65,7 @@ AS SELECT OWNER, MVIEW_NAME, SYSDATE ST, SYSDATE ET FROM USER_MVIEWS WHERE 0 = 1
     END LOOP;
     */
   END IF;
+
 END;
 /
 
@@ -77,6 +78,7 @@ spool off
 --          2) nohup sqlplus dba_admin/dba_admin < /tmp/refresh_mviews.sql &
 
 set serveroutput on
+
 
 DECLARE
   l_msg       VARCHAR2(100);
@@ -100,7 +102,13 @@ BEGIN
         VALUES
           (tmp.owner, tmp.mview_name, l_st, NULL);
         COMMIT;
-        dbms_mview.refresh(l_msg);
+        IF tmp.mview_name IN
+           ('HISTORICAL_CELL_VALUE_M_V', 'COAL_FLOW_FORECAST_IMPORT_M_V',
+            'VESSEL_DAILY_LOCATION_M_V') THEN
+          dbms_mview.refresh(list => l_msg, atomic_refresh => FALSE);
+        ELSE
+          dbms_mview.refresh(l_msg);
+        END IF;
         UPDATE byu_mview_list_log
            SET et = SYSDATE
          WHERE owner = tmp.owner

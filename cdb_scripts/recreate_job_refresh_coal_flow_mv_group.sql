@@ -18,6 +18,6 @@ BEGIN
   dbms_scheduler.set_job_argument_value(job_name          => 'REFRESH_COAL_FLOW_MV_GROUP',
                                         argument_position => 2,
                                         argument_value    => null);
-  dbms_scheduler.enable('REFRESH_COAL_FLOW_MV_GROUP');
+  --dbms_scheduler.enable('REFRESH_COAL_FLOW_MV_GROUP');
 END;
 /

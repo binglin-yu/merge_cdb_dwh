@@ -144,7 +144,7 @@ impdp dba_admin/dba_admin parfile=impCE_data.par_cef2;
 > @gen_enable_non_r_constraints.sql;
 > @enable_non_r_constraints.sql;
 > connect dba_admin/dba_admin
--- !!!!!! run the scripts in validate_constraints_in_parallel1.sql separately (8 sessions) !!!!!  
+-- !!!!!! run the scripts in validate_constraints_in_parallel.sql separately (8 sessions) !!!!!  
 
 -- remove the temporary indexes
 > @remove_tmp_indexes.sql
@@ -232,6 +232,7 @@ SELECT *
 
 
 -- refresh all mviews (20 mins)
+-- connect dba_admin/dba_admin
 -- !!!!!! run the scripts in refresh_mviews_in_parallel.sql separately (8 sessions) !!!!!  
  
 -- refresh some special mviews in sequence 
