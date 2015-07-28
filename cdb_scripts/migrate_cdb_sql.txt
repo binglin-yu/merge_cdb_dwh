@@ -32,7 +32,7 @@ expdp dba_admin/dba_admin parfile=expCE_data.par_cef2;
 /*******************************************************/
 -- steps on new db
 --create new tablespaces on Prod database:
-> conn /as sysdba
+> conn / as sysdba
 > @create_tablespaces.sql
 > @create_users.sql
 -- set  pwd for user dba_admin
@@ -129,7 +129,7 @@ impdp dba_admin/dba_admin parfile=impCE_data.par_cef2;
 -- recollect statistics for the related objects
 > exec DBMS_STATS.UNLOCK_SCHEMA_STATS ('CEF_CNR');
 > @gen_gather_ind_statistics.sql;
-> @gather_ind_statistics;
+> @gather_ind_statistics.sql;
 /*************************** 
 -- or run the below to collect statistics for tables directly
 > EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'VESSEL_LOCATION',estimate_percent=>100,degree=>8,cascade=>true);
@@ -166,7 +166,9 @@ impdp dba_admin/dba_admin parfile=impCE_data.par_cef2;
 > @recreate_cef_apds_historical_cell_value_mv.sql;
 
 -- recreate CEF_CNR.DIMENSION_DATA_MV
+--     note that, it's ok if the mv doesn't exist before.
 > @recreate_cef_cnr_dimension_data_mv.sql;
+
 
 -- recreate job refresh_coal_flow_mv_group
 > connect cef_apds/cef_apds
@@ -212,6 +214,7 @@ impdp dba_admin/dba_admin parfile=impCE_data.par_cef2;
 
 
 -- remove the temporary objects
+--    note that, it's ok some objects don't exit 
 > @remove_old_temporary_objects.sql;
 
 
