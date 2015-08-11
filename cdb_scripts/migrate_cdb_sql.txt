@@ -293,10 +293,21 @@ EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'PIERS_TRANSAC
 ***************************************************************/
 
 -- start all jobs
+> connect dba_admin/dba_admin
 > @start_jobs.sql;
 
 -- grant special privs for DWH
 > @grant_privs_to_dwh.sql;
 
 
+-------------------------------------------------
+--  changes on existing DWH staff
+> connect dba_admin/dba_admin
+> DROP PUBLIC DATABASE LINK CEF_CNR;
+
+-- note that, the below connection string will be changed in prod release
+> CREATE PUBLIC DATABASE LINK CEF_CNR CONNECT TO CEF_CNR IDENTIFIED BY cef_cnr 
+>   USING 'pc-scan-dd0076.int.thomsonreuters.com:1521/pocbt.int.thomsonreuters.com';
+
+> alter package flowzone.PKG_CEF_CNR_SYNCH compile;
 
