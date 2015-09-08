@@ -32,7 +32,7 @@ execute ste_apds.refresh_ste_cnr;
 
 
 --group 2
-connect cef_apds/cef_apds
+connect CEF_APDS/CEF_APDS
 execute CEF_APDS.pkg_coal_flow_refreshing.refresh_data_trunk('BYU_TEST_COAL_FLOW', NULL);
 -- note if, the procedure failed, refresh the following mviews manually:
 /*

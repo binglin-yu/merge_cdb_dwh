@@ -171,23 +171,23 @@ impdp dba_admin/dba_admin parfile=impCE_data.par_cef2;
 
 
 -- recreate job refresh_coal_flow_mv_group
-> connect cef_apds/cef_apds
+> connect CEF_APDS/CEF_APDS
 > @recreate_job_refresh_coal_flow_mv_group.sql
 
 -- move all refreshing jobs to dba_scheduler_jobs
-> connect mpd2_apds/mpd2_apds
+> connect MPD2_APDS/MPD2_APDS
 > @replace_MPD2_APDS_10M_RG1.sql;
 
-> connect ems_apds/ems_apds
+> connect EMS_APDS/EMS_APDS
 > @replace_EMS_APDS_6H_RG1.sql;
 
-> connect ste_cnr/ste_cnr
+> connect STE_CNR/STE_CNR
 > @replace_STE_CNR_30M_RG1.sql;
 
-> connect ems_cnr/ems_cnr
+> connect EMS_CNR/EMS_CNR
 > @replace_EMS_CNR_dba_jobs.sql;
 
-> connect mpd2_cnr/mpd2_cnr
+> connect MPD2_CNR/MPD2_CNR
 > @replace_MPD2_CNR_dba_jobs.sql;
 
 
@@ -201,7 +201,7 @@ impdp dba_admin/dba_admin parfile=impCE_data.par_cef2;
 > drop materialized view CEF_APDS.CHINA_POR_BER_ANC_M_V;
 
 -- Oil in OIL_CNR mvs
-> connect oil_cnr/oil_cnr
+> connect OIL_CNR/OIL_CNR
 > execute DBMS_JOB.REMOVE(24400087);
 > execute DBMS_JOB.REMOVE(29014831);
 > commit;
@@ -306,8 +306,13 @@ EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'PIERS_TRANSAC
 > DROP PUBLIC DATABASE LINK CEF_CNR;
 
 -- note that, the below connection string will be changed in prod release
-> CREATE PUBLIC DATABASE LINK CEF_CNR CONNECT TO CEF_CNR IDENTIFIED BY cef_cnr 
+> CREATE PUBLIC DATABASE LINK CEF_CNR CONNECT TO CEF_CNR IDENTIFIED BY CEF_CNR 
 >   USING 'pc-scan-dd0076.int.thomsonreuters.com:1521/pocbt.int.thomsonreuters.com';
+/************
+* use this connection string for HDC
+* at-scan-pz0288.int.thomsonreuters.com:1521/pocb.int.thomsonreuters.com
+*
+***************/
 
 > alter package flowzone.PKG_CEF_CNR_SYNCH compile;
 
