@@ -1,9 +1,9 @@
 /*******************************************************/
 -- steps on old db
 -- dump metadata from old DB
-mkdir /n04/oraarch2/ce_pump_dir
+mkdir /n02/oraarch2/ce_pump_dir
 -- conn dba_admin/dba_admin
-> create directory CE_PUMP_DIR as '/n04/oraarch2/ce_pump_dir';
+> create directory CE_PUMP_DIR as '/n02/oraarch2/ce_pump_dir';
 
 -- collect public synonyms and specific privs
 > @gen_create_public_synonym.sql
@@ -41,7 +41,7 @@ expdp dba_admin/dba_admin parfile=expCE_data.par_cef2;
 
 -- import metadata
 > connect dba_admin/dba_admin
-> create or replace directory CE_PUMP_DIR as '/n04/oraarch2/ce_pump_dir';
+> create or replace directory CE_PUMP_DIR as '/n02/oraarch2/ce_pump_dir';
 
 -- impdp cost around 8 mins (<=10mins)
 impdp dba_admin/dba_admin parfile=impCE_metadata.par
