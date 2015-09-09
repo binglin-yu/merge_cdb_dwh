@@ -307,10 +307,10 @@ EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'PIERS_TRANSAC
 
 -- note that, the below connection string will be changed in prod release
 > CREATE PUBLIC DATABASE LINK CEF_CNR CONNECT TO CEF_CNR IDENTIFIED BY CEF_CNR 
->   USING 'pc-scan-dd0076.int.thomsonreuters.com:1521/pocbt.int.thomsonreuters.com';
+>   USING 'pc-scan-pd0075.int.thomsonreuters.com:1521/pocb02.int.thomsonreuters.com';
 /************
 * use this connection string for HDC
-* at-scan-pz0288.int.thomsonreuters.com:1521/pocb.int.thomsonreuters.com
+* at-scan-pz0288.int.thomsonreuters.com:1521/pocb02.int.thomsonreuters.com 
 *
 ***************/
 
