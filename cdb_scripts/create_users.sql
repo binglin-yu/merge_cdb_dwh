@@ -32,8 +32,8 @@ create user OTD_PDS identified by OTD_PDS default tablespace CEF_CNR_DATA01    t
 create user FRT_PDS identified by FRT_PDS default tablespace CEF_CNR_DATA01    temporary tablespace temp01;
 
 
-create user nda_cnr identified by nda_cnr default tablespace NDA_CNR_DATA01 temporary tablespace temp01;
-grant connect,resource to nda_cnr;
+create user NDA_CNR identified by NDA_CNR default tablespace NDA_CNR_DATA01 temporary tablespace temp01;
+grant connect,resource to NDA_CNR;
 
 /*
 create role PLUSTRACE;
