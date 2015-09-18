@@ -316,3 +316,7 @@ EXECUTE DBMS_STATS.GATHER_TABLE_STATS(ownname=>'CEF_CNR',tabname=>'PIERS_TRANSAC
 
 > alter package flowzone.PKG_CEF_CNR_SYNCH compile;
 
+
+-- connect spatial/spatial, to cfg spatial basic info and create spatial indexes
+> connect spatial/spatial
+> @spatial_steps.sql
